@@ -1,7 +1,8 @@
 {
-	"name": "repo-template",
+	"name": "code-sdl",
 	"version-string": "0.1.0",
 	"dependencies": [
-		"opencv"
+		"glad",
+		"sdl2"
 	]
 }

@@ -57,10 +57,22 @@ endif()
 #==================================================================================#
 
 # OpenCV
-find_package(OpenCV CONFIG REQUIRED)
-message("OpenCV_FOUND = ${OpenCV_FOUND}")
-message("OpenCV_VERSION = ${OpenCV_VERSION}")
-message("OpenCV_LIBS = ${OpenCV_LIBS}")
+# find_package(OpenCV CONFIG REQUIRED)
+# message("OpenCV_FOUND = ${OpenCV_FOUND}")
+# message("OpenCV_VERSION = ${OpenCV_VERSION}")
+# message("OpenCV_LIBS = ${OpenCV_LIBS}")
+
+# SDL 
+find_package(SDL2 CONFIG REQUIRED)
+message("SDL2_FOUND = ${SDL2_FOUND}")
+message("SDL2_VERSION = ${SDL2_VERSION}")
+message("SDL2_LIBS = ${SDL2_LIBS}")
+
+# glad 
+find_package(glad CONFIG REQUIRED)
+message("glad_FOUND = ${glad_FOUND}")
+message("glad_VERSION = ${glad_VERSION}")
+message("glad_LIBS = ${glad_LIBS}")
 
 # 外部依赖项
 set(DPS_INCLUDES)
@@ -83,7 +95,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CommonTools)
 
-add_subdirectory(memory_array_opencv)
+add_subdirectory(sdl_hello_world)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)
