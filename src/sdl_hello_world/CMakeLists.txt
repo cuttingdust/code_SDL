@@ -6,6 +6,7 @@ project(${CURRENT_DIR})
 set(DPS_LIBRARYS
     ${glad_MOUDLES}
     ${SDL_MOUDLES}
+    ${glm_MOUDLES}
 )
 
 cpp_execute(${PROJECT_NAME})

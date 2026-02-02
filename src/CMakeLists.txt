@@ -74,6 +74,12 @@ message("glad_FOUND = ${glad_FOUND}")
 message("glad_VERSION = ${glad_VERSION}")
 message("glad_LIBS = ${glad_LIBS}")
 
+# glm 
+find_package(glm CONFIG REQUIRED)
+message("glm_FOUND = ${glm_FOUND}")
+message("glm_VERSION = ${glm_VERSION}")
+message("glm_LIBS = ${glm_LIBS}")
+
 # 外部依赖项
 set(DPS_INCLUDES)
 set(DPS_TARGETS)
