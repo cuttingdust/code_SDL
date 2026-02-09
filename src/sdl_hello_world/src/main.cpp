@@ -1,5 +1,6 @@
 ﻿#include "Display.h"
 #include "Mesh.h"
+#include "Shader.h"
 
 #include <iostream>
 
@@ -13,10 +14,13 @@ int main(int argc, char* argv[])
 
     Mesh mesh(vertices, 3);
 
+    Shader shader(R"(.\assert\shader\basicShader)");
+
     while (!display.isClosed())
     {
         display.clear(0.f, 0.15f, 0.3f, 1.f);
 
+        shader.bind();
         mesh.draw();
 
         display.update();
