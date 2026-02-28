@@ -10,8 +10,11 @@ int main(int argc, char* argv[])
 {
     Display display(800, 600, "My Display");
 
-    Vertex vertices[] = { Vertex(glm::vec3(-0.5f, -0.5f, 0.0f)), Vertex(glm::vec3(0.5f, -0.5f, 0.0f)),
-                          Vertex(glm::vec3(0.0f, 0.5f, 0.0f)) };
+    Vertex vertices[] = {
+        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(0.0f, 0.0f)), // 左下
+        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(1.0f, 0.0f)),  // 右下
+        Vertex(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec2(0.5f, 1.0f))    // 顶部居中
+    };
 
     Mesh mesh(vertices, 3);
 

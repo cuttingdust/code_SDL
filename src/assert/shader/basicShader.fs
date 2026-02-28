@@ -1,7 +1,14 @@
-﻿#version 460
-out vec4 fragColor; 
+﻿#version 330 core
+out vec4 FragColor;
+
+in vec3 ourColor;
+in vec2 TexCoord;
+
+uniform sampler2D texture0;
+uniform sampler2D textureSmile;
+uniform float ratio;
 
 void main()
 {
-    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    FragColor = texture(texture0, TexCoord);
 }

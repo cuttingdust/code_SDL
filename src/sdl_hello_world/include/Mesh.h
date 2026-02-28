@@ -7,13 +7,25 @@
 class Vertex
 {
 public:
-    Vertex(const glm::vec3& pos)
+    Vertex(const glm::vec3& pos, const glm::vec2& texCoord)
     {
         position_ = pos;
+        texCoord_ = texCoord;
+    }
+
+    inline glm::vec3* getPos()
+    {
+        return &position_;
+    }
+
+    inline glm::vec2* getTexCoord()
+    {
+        return &texCoord_;
     }
 
 private:
     glm::vec3 position_;
+    glm::vec2 texCoord_;
 };
 
 
@@ -30,6 +42,7 @@ private:
     enum
     {
         POSITION_VB,
+        TEXCOORD_VB,
         NUM_BUFFERS
     };
 
