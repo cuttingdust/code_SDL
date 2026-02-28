@@ -80,6 +80,12 @@ message("glm_FOUND = ${glm_FOUND}")
 message("glm_VERSION = ${glm_VERSION}")
 message("glm_LIBS = ${glm_LIBS}")
 
+# Stb 
+find_package(Stb REQUIRED)
+message("Stb_FOUND = ${Stb_FOUND}")
+message("Stb_VERSION = ${Stb_VERSION}")
+message("Stb_LIBS = ${Stb_LIBS}")
+
 # 外部依赖项
 set(DPS_INCLUDES)
 set(DPS_TARGETS)

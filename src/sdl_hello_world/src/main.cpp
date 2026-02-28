@@ -1,6 +1,7 @@
 ﻿#include "Display.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #include <iostream>
 
@@ -16,11 +17,14 @@ int main(int argc, char* argv[])
 
     Shader shader(R"(.\assert\shader\basicShader)");
 
+    Texture texture(R"(.\assert\textures\container.jpg)");
+
     while (!display.isClosed())
     {
         display.clear(0.f, 0.15f, 0.3f, 1.f);
 
         shader.bind();
+        texture.bind();
         mesh.draw();
 
         display.update();

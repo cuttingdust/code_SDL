@@ -3,6 +3,10 @@ get_filename_component(CURRENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 project(${CURRENT_DIR})
 
+set(DPS_INCLUDES
+    ${Stb_INCLUDE_DIR}
+)
+
 set(DPS_LIBRARYS
     ${glad_MOUDLES}
     ${SDL_MOUDLES}
