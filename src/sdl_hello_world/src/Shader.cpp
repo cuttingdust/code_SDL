@@ -90,11 +90,15 @@ Shader::Shader(const std::string& filename)
     glBindAttribLocation(program_, 0, "aPos");
     glBindAttribLocation(program_, 1, "aTexCoord");
 
+    /// 链接程序
     glLinkProgram(program_);
     CheckShaderError(program_, GL_LINK_STATUS, true, "Error: Program linking failed!");
 
+    /// 验证程序
     glValidateProgram(program_);
     CheckShaderError(program_, GL_VALIDATE_STATUS, true, "Error: Program is invalid!");
+
+    uniforms_[TRNASFORM_U] = glGetUniformLocation(program_, "transform");
 }
 
 Shader::~Shader()
@@ -110,4 +114,10 @@ Shader::~Shader()
 void Shader::bind()
 {
     glUseProgram(program_);
+}
+
+void Shader::update(const Transform& transform)
+{
+    glm::mat4 model = transform.getModel();
+    glUniformMatrix4fv(uniforms_[TRNASFORM_U], 1, GL_FALSE, &model[0][0]);
 }

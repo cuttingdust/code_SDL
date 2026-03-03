@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Transform.h"
 
 #include <iostream>
 
@@ -22,15 +23,25 @@ int main(int argc, char* argv[])
 
     Texture texture(R"(.\assert\textures\container.jpg)");
 
+    Transform transform;
+
+    float counter = 0.f;
     while (!display.isClosed())
     {
         display.clear(0.f, 0.15f, 0.3f, 1.f);
 
+        float sinCounter = std::sin(counter);
+
+        transform.setRot(glm::vec3(0.f, 0.f, sinCounter * 2.f));
+
         shader.bind();
         texture.bind();
+        shader.update(transform);
         mesh.draw();
 
         display.update();
+
+        counter += 0.01f;
     }
 
     getchar();

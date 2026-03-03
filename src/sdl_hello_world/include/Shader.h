@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Transform.h"
+
 #include <glad/glad.h>
 
 #include <string>
@@ -13,8 +15,17 @@ public:
 public:
     void bind();
 
+    void update(const Transform& transform);
+
 private:
     static const unsigned int NUM_SHADERS_ = 2;
-    GLuint                    program_     = 0;
-    GLuint                    shaders_[NUM_SHADERS_];
+
+    enum
+    {
+        TRNASFORM_U,
+        NUM_UNIFORMS_
+    };
+    GLuint program_ = 0;
+    GLuint shaders_[NUM_SHADERS_];
+    GLuint uniforms_[NUM_UNIFORMS_];
 };
