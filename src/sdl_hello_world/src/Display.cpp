@@ -70,9 +70,9 @@ Display::Display(int width, int height, const std::string_view &title) : impl_(s
     impl_->isClosed_ = false;
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
+    /// 深度测试是关键。没有深度测试，
+    /// OpenGL 不知道哪个三角形在前面，
+    /// 导致后面的三角形覆盖前面的，或者随机出现，看起来就像“少了一面”。
 }
 
 Display::~Display()
