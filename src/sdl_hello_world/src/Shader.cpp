@@ -98,7 +98,12 @@ Shader::Shader(const std::string& filename)
     glValidateProgram(program_);
     CheckShaderError(program_, GL_VALIDATE_STATUS, true, "Error: Program is invalid!");
 
-    uniforms_[TRNASFORM_U] = glGetUniformLocation(program_, "transform");
+
+    // GLint transformLoc = glGetUniformLocation(program_, "transform");
+    // std::cout << "Transform uniform location: " << transformLoc << std::endl;
+    // uniforms_[TRANSFORM_U] = transformLoc;
+
+    uniforms_[TRANSFORM_U] = glGetUniformLocation(program_, "transform");
 }
 
 Shader::~Shader()
@@ -119,5 +124,6 @@ void Shader::bind()
 void Shader::update(const Transform& transform)
 {
     glm::mat4 model = transform.getModel();
-    glUniformMatrix4fv(uniforms_[TRNASFORM_U], 1, GL_FALSE, &model[0][0]);
+    // std::cout << "Updating transform, matrix[0][0] = " << model[0][0] << std::endl; // 看值是否变化
+    glUniformMatrix4fv(uniforms_[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
 }

@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     {
         display.clear(0.f, 0.15f, 0.3f, 1.f);
 
-        float sinCounter = std::sin(counter);
+        float sinCounter = std::sinf(counter);
 
         transform.setRot(glm::vec3(0.f, 0.f, sinCounter * 2.f));
 

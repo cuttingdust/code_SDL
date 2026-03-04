@@ -22,7 +22,7 @@ private:
 
     enum
     {
-        TRNASFORM_U,
+        TRANSFORM_U,
         NUM_UNIFORMS_
     };
     GLuint program_ = 0;
