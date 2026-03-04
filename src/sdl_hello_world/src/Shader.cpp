@@ -101,9 +101,9 @@ Shader::Shader(const std::string& filename)
     CheckShaderError(program_, GL_VALIDATE_STATUS, true, "Error: Program is invalid!");
 
 
-    // GLint transformLoc = glGetUniformLocation(program_, "transform");
-    // std::cout << "Transform uniform location: " << transformLoc << std::endl;
-    // uniforms_[TRANSFORM_U] = transformLoc;
+    GLint transformLoc = glGetUniformLocation(program_, "transform");
+    std::cout << "Transform uniform location: " << transformLoc << std::endl;
+    uniforms_[TRANSFORM_U] = transformLoc;
 
     uniforms_[TRANSFORM_U] = glGetUniformLocation(program_, "transform");
 }

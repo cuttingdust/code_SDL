@@ -5,106 +5,222 @@
 #include "Texture.h"
 #include "Transform.h"
 
+#include <algorithm>
 #include <iostream>
-#include <vector>
+
+#define SDL_MAIN_HANDLED // 告诉 SDL 我们自己处理 main 函数
+#include <SDL2/SDL.h>
 
 #define WIDTH  800
 #define HEIGHT 600
 
+// 创建立方体的顶点数据
+std::vector<Vertex> createCubeVertices()
+{
+    std::vector<Vertex> vertices;
+
+    // 前面
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)));
+
+    // 后面
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+
+    // 左面
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+
+    // 右面
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+
+    // 上面
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+
+    // 下面
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 1.0f)));
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+
+    return vertices;
+}
+
 int main(int argc, char* argv[])
 {
-    Display display(800, 600, "My Display");
+    setlocale(LC_ALL, "zh_CN.UTF-8");
 
-    // ========== 创建第一个三角形（红色纹理） ==========
-    Vertex vertices1[] = {
-        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(0.0f, 0.0f)), // 左下
-        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(1.0f, 0.0f)),  // 右下
-        Vertex(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec2(0.5f, 1.0f))    // 顶部居中
-    };
-    Mesh mesh1(vertices1, 3);
+    Display display(800, 600, "Camera Comparison");
 
-    // ========== 创建第二个三角形（放在右边，稍微靠后） ==========
-    Vertex vertices2[] = {
-        Vertex(glm::vec3(-0.3f, -0.3f, 0.5f), glm::vec2(0.0f, 0.0f)), // 左下
-        Vertex(glm::vec3(0.3f, -0.3f, 0.5f), glm::vec2(1.0f, 0.0f)),  // 右下
-        Vertex(glm::vec3(0.0f, 0.3f, 0.5f), glm::vec2(0.5f, 1.0f))    // 顶部居中
-    };
-    Mesh mesh2(vertices2, 3);
+    /// 创建立方体
+    auto cubeVertices = createCubeVertices();
+    Mesh cubeMesh(cubeVertices.data(), cubeVertices.size());
 
-    // ========== 创建第三个三角形（放在左边，更靠前） ==========
-    Vertex vertices3[] = {
-        Vertex(glm::vec3(-0.4f, -0.4f, -0.5f), glm::vec2(0.0f, 0.0f)), // 左下
-        Vertex(glm::vec3(0.4f, -0.4f, -0.5f), glm::vec2(1.0f, 0.0f)),  // 右下
-        Vertex(glm::vec3(0.0f, 0.4f, -0.5f), glm::vec2(0.5f, 1.0f))    // 顶部居中
-    };
-    Mesh mesh3(vertices3, 3);
-
+    /// 创建着色器和纹理
     Shader  shader(R"(.\assert\shader\basicShader)");
     Texture texture(R"(.\assert\textures\container.jpg)");
 
-    // 初始化摄像机
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f),  /// 位置
-                  glm::vec3(0.0f, 0.0f, -1.0f), /// 前方方向
-                  glm::vec3(0.0f, 1.0f, 0.0f),  /// 上方方向
-                  (float)WIDTH / (float)HEIGHT, /// 宽高比
-                  60.0f,                        /// FOV
-                  0.1f,                         /// 近平面
-                  1000.0f                       /// 远平面
+    /// 创建透视摄像机
+    PerspectiveCamera perspCam(glm::vec3(0.0f, 0.0f, 3.0f),  // 位置
+                               glm::vec3(0.0f, 0.0f, -1.0f), // 前方
+                               glm::vec3(0.0f, 1.0f, 0.0f),  // 上方
+                               (float)WIDTH / (float)HEIGHT, // 宽高比
+                               60.0f                         // FOV
     );
 
-    // 为每个三角形创建独立的变换对象
-    Transform transform1; // 中心三角形
-    Transform transform2; // 右边三角形
-    Transform transform3; // 左边三角形
+    /// 创建正交摄像机
+    OrthographicCamera orthoCam = OrthographicCamera::createWithSize(2.0f, // size = 2，视野高度为4个单位
+                                                                     (float)WIDTH / (float)HEIGHT, // 宽高比
+                                                                     0.1f,                         // 近平面
+                                                                     1000.0f                       // 远平面
+    );
+    orthoCam.setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
 
-    // 设置第二个三角形的位置（右边）
-    transform2.setPos(glm::vec3(1.2f, 0.0f, 0.0f));
+    /// 创建三个物体来演示深度效果
+    Transform cube1; /// 中心
+    Transform cube2; /// 右边远处
+    Transform cube3; /// 左边近处
 
-    // 设置第三个三角形的位置（左边）
-    transform3.setPos(glm::vec3(-1.2f, 0.0f, 0.0f));
+    cube2.setPos(glm::vec3(1.5f, 0.0f, 1.0f));   // 右边，Z正方向（更远）
+    cube3.setPos(glm::vec3(-1.5f, 0.0f, -1.0f)); // 左边，Z负方向（更近）
 
-    // 启用深度测试
-    glEnable(GL_DEPTH_TEST);
+    cube2.setScale(glm::vec3(0.7f)); // 稍微小一点
+    cube3.setScale(glm::vec3(0.7f));
 
-    float counter = 0.f;
-    std::cout << "开始渲染循环... 按窗口关闭按钮退出" << std::endl;
-    std::cout << "三个三角形应该位于：中心、右边、左边" << std::endl;
+    std::cout << "===== 摄像机对比演示 =====" << std::endl;
+    std::cout << "按 1 键: 透视摄像机 (近大远小)" << std::endl;
+    std::cout << "按 2 键: 正交摄像机 (大小不变)" << std::endl;
+    std::cout << "按 + / - 键: 调整正交摄像机视野大小" << std::endl;
+    std::cout << "按 W/A/S/D: 移动摄像机位置" << std::endl;
+    std::cout << "========================" << std::endl;
+
+    bool  usePerspective = true;
+    float orthoSize      = 2.0f;
+    float counter        = 0.0f;
 
     while (!display.isClosed())
     {
-        display.clear(0.f, 0.15f, 0.3f, 1.f);
+        display.clear(0.0f, 0.15f, 0.3f, 1.0f);
 
-        // 中心三角形：绕Z轴旋转
-        float angle = counter * 2.f;
-        transform1.setRot(glm::vec3(0.f, 0.f, angle));
+        // 处理键盘输入
+        const Uint8* keystate = SDL_GetKeyboardState(NULL);
 
-        // 右边三角形：绕Y轴旋转（产生不同的视觉效果）
-        transform2.setRot(glm::vec3(0.f, angle * 0.5f, 0.f));
+        // 切换摄像机类型
+        if (keystate[SDL_SCANCODE_1])
+            usePerspective = true;
+        if (keystate[SDL_SCANCODE_2])
+            usePerspective = false;
 
-        // 左边三角形：上下浮动 + 旋转
-        float yOffset = std::sin(counter) * 0.5f;
-        transform3.setPos(glm::vec3(-1.2f, yOffset, 0.0f));
-        transform3.setRot(glm::vec3(angle, angle * 0.3f, 0.f));
+        // 调整正交摄像机大小
+        if (keystate[SDL_SCANCODE_EQUALS] || keystate[SDL_SCANCODE_KP_PLUS])
+        {
+            orthoSize -= 0.02f;
+            orthoSize = std::max(orthoSize, 0.5f);
+            orthoCam.setSize(orthoSize, (float)WIDTH / (float)HEIGHT);
+        }
+        if (keystate[SDL_SCANCODE_MINUS] || keystate[SDL_SCANCODE_KP_MINUS])
+        {
+            orthoSize += 0.02f;
+            orthoSize = std::min(orthoSize, 5.0f);
+            orthoCam.setSize(orthoSize, (float)WIDTH / (float)HEIGHT);
+        }
+
+        /// 移动摄像机
+        float     moveSpeed = 0.05f;
+        glm::vec3 camPos    = usePerspective ? perspCam.getPosition() : orthoCam.getPosition();
+
+        if (keystate[SDL_SCANCODE_W])
+            camPos.z -= moveSpeed;
+        if (keystate[SDL_SCANCODE_S])
+            camPos.z += moveSpeed;
+        if (keystate[SDL_SCANCODE_A])
+            camPos.x -= moveSpeed;
+        if (keystate[SDL_SCANCODE_D])
+            camPos.x += moveSpeed;
+
+        if (usePerspective)
+        {
+            perspCam.setPosition(camPos);
+            perspCam.setLookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+        }
+        else
+        {
+            orthoCam.setPosition(camPos);
+        }
+
+        /// 让物体旋转
+        cube1.setRot(glm::vec3(0.0f, counter * 0.5f, 0.0f));
+        cube2.setRot(glm::vec3(0.0f, counter * 0.8f, 0.0f));
+        cube3.setRot(glm::vec3(0.0f, counter * 1.2f, 0.0f));
 
         shader.bind();
         texture.bind();
 
-        // 绘制三个三角形
-        shader.update(transform1, camera);
-        mesh1.draw();
+        /// 根据摄像机类型渲染
+        if (usePerspective)
+        {
+            shader.update(cube1, perspCam);
+            cubeMesh.draw();
+            shader.update(cube2, perspCam);
+            cubeMesh.draw();
+            shader.update(cube3, perspCam);
+            cubeMesh.draw();
 
-        shader.update(transform2, camera);
-        mesh2.draw();
+            static int frame = 0;
+            if (++frame % 60 == 0)
+            {
+                glm::vec3 pos = perspCam.getPosition();
+                std::cout << "\r使用: 透视摄像机 | 位置: (" << pos.x << ", " << pos.y << ", " << pos.z << ") | FOV: 60°"
+                          << std::flush;
+            }
+        }
+        else
+        {
+            shader.update(cube1, orthoCam);
+            cubeMesh.draw();
+            shader.update(cube2, orthoCam);
+            cubeMesh.draw();
+            shader.update(cube3, orthoCam);
+            cubeMesh.draw();
 
-        shader.update(transform3, camera);
-        mesh3.draw();
+            static int frame = 0;
+            if (++frame % 60 == 0)
+            {
+                glm::vec3 pos = orthoCam.getPosition();
+                std::cout << "\r使用: 正交摄像机 | 位置: (" << pos.x << ", " << pos.y << ", " << pos.z
+                          << ") | 大小: " << orthoSize << std::flush;
+            }
+        }
 
         display.update();
-
         counter += 0.01f;
     }
 
-    std::cout << "\n渲染循环结束" << std::endl;
+    std::cout << "\n程序退出" << std::endl;
     getchar();
     return 0;
 }
