@@ -1,5 +1,7 @@
 ﻿#include "Shader.h"
 
+#include "Camera.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -121,9 +123,10 @@ void Shader::bind()
     glUseProgram(program_);
 }
 
-void Shader::update(const Transform& transform)
+void Shader::update(const Transform& transform, const Camera& camera)
 {
-    glm::mat4 model = transform.getModel();
+    // glm::mat4 model = camera.getProjectionMatrix() * camera.getViewMatrix() * transform.getModel();
+    glm::mat4 model = camera.getProjectionMatrix() * camera.getViewMatrix() * transform.getModel();
     // std::cout << "Updating transform, matrix[0][0] = " << model[0][0] << std::endl; // 看值是否变化
     glUniformMatrix4fv(uniforms_[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
 }

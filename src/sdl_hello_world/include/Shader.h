@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Camera.h"
 #include "Transform.h"
 
 #include <glad/glad.h>
@@ -15,7 +16,7 @@ public:
 public:
     void bind();
 
-    void update(const Transform& transform);
+    void update(const Transform& transform, const Camera& camera);
 
 private:
     static const unsigned int NUM_SHADERS_ = 2;

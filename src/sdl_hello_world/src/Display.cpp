@@ -68,6 +68,8 @@ Display::Display(int width, int height, const std::string_view &title) : impl_(s
     }
 
     impl_->isClosed_ = false;
+
+    // glEnable(GL_DEPTH_TEST);
 }
 
 Display::~Display()
