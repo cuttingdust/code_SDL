@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <iostream>
 
-#define SDL_MAIN_HANDLED // 告诉 SDL 我们自己处理 main 函数
+#define SDL_MAIN_HANDLED /// 告诉 SDL 我们自己处理 main 函数
 #include <SDL2/SDL.h>
 
 #define WIDTH  800
