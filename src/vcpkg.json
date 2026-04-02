@@ -5,6 +5,7 @@
 		"glad",
 		"sdl2",
 		"glm", 
-		"stb"
+		"stb",
+		"freeglut"
 	]
 }

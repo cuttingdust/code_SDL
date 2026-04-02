@@ -139,6 +139,11 @@ set(glm_MOUDLES
 	glm::glm-header-only
 )
 
+# glut
+set(glut_MOUDLES
+	GLUT::GLUT
+)
+
 # 获取当前目录下源码和头文件
 macro(get_src_include)
     aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src SRC)

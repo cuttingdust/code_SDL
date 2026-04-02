@@ -80,6 +80,12 @@ message("glm_FOUND = ${glm_FOUND}")
 message("glm_VERSION = ${glm_VERSION}")
 message("glm_LIBS = ${glm_LIBS}")
 
+# glut 
+find_package(GLUT REQUIRED)
+message("GLUT_FOUND = ${GLUT_FOUND}")
+message("GLUT_VERSION = ${GLUT_VERSION}")
+message("GLUT_LIBS = ${GLUT_LIBS}")
+
 # Stb 
 find_package(Stb REQUIRED)
 message("Stb_FOUND = ${Stb_FOUND}")
@@ -108,6 +114,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CommonTools)
 
 add_subdirectory(sdl_hello_world)
+add_subdirectory(glut_hello_world)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)
