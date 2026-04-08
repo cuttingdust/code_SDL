@@ -1,226 +1,321 @@
-﻿#include "Camera.h"
-#include "Display.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Transform.h"
+﻿#define SDL_MAIN_HANDLED
+#include <SDL.h>
 
-#include <algorithm>
-#include <iostream>
+#include <glad/glad.h>
 
-#define SDL_MAIN_HANDLED /// 告诉 SDL 我们自己处理 main 函数
-#include <SDL2/SDL.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#define WIDTH  800
-#define HEIGHT 600
+#include <cstdio>
 
-// 创建立方体的顶点数据
-std::vector<Vertex> createCubeVertices()
+// #define GLUT_KEY_ESCAPE 27
+
+constexpr GLsizei gWidth  = 500;
+constexpr GLsizei gHeight = 500;
+
+GLfloat cubeRotateX = 45.f;
+GLfloat cubeRotateY = 45.f;
+bool    keys[255];
+
+/// 窗口和 OpenGL 上下文
+SDL_Window   *gWindow   = nullptr;
+SDL_GLContext gContext  = nullptr;
+bool          isRunning = true;
+
+GLvoid estableishProjectionMatrix(GLsizei width, GLsizei height)
 {
-    std::vector<Vertex> vertices;
+    /// 1. 设置视口 (这部分保持不变)
+    glViewport(0, 0, width, height);
 
-    // 前面
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)));
+    /// 2. 切换到投影矩阵模式 (这部分也保持不变)
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-    // 后面
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    /// 3. 核心改动：用 GLM 计算透视投影矩阵
+    float aspect = (float)width / (float)height;
+    /// glm::perspective 的参数：视角(FOV, 弧度), 宽高比, 近平面, 远平面
+    /// 注意：glm::radians(45.0f) 将45度角转换为弧度
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), aspect, 0.1f, 200.0f);
 
-    // 左面
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
+    /// 4. 将计算好的矩阵加载到 OpenGL 的投影矩阵栈中
+    glLoadMatrixf(glm::value_ptr(projectionMatrix));
 
-    // 右面
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-
-    // 上面
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-
-    // 下面
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 1.0f)));
-    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)));
-
-    return vertices;
+    /// 5. 最后，切换回模型视图矩阵模式 (这部分也保持不变)
+    glMatrixMode(GL_MODELVIEW);
 }
 
-int main(int argc, char* argv[])
+GLvoid initGL(GLsizei width, GLsizei height)
 {
-    setlocale(LC_ALL, "zh_CN.UTF-8");
+    estableishProjectionMatrix(width, height);
 
-    Display display(800, 600, "Camera Comparison");
+    glShadeModel(GL_SMOOTH);
 
-    /// 创建立方体
-    auto cubeVertices = createCubeVertices();
-    Mesh cubeMesh(cubeVertices.data(), cubeVertices.size());
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    /// 创建着色器和纹理
-    Shader  shader(R"(.\assert\shader\basicShader)");
-    Texture texture(R"(.\assert\textures\container.jpg)");
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
-    /// 创建透视摄像机
-    PerspectiveCamera perspCam(glm::vec3(0.0f, 0.0f, 3.0f),  // 位置
-                               glm::vec3(0.0f, 0.0f, -1.0f), // 前方
-                               glm::vec3(0.0f, 1.0f, 0.0f),  // 上方
-                               (float)WIDTH / (float)HEIGHT, // 宽高比
-                               60.0f                         // FOV
-    );
+    glDisable(GL_CULL_FACE);
 
-    /// 创建正交摄像机
-    OrthographicCamera orthoCam = OrthographicCamera::createWithSize(2.0f, // size = 2，视野高度为4个单位
-                                                                     (float)WIDTH / (float)HEIGHT, // 宽高比
-                                                                     0.1f,                         // 近平面
-                                                                     1000.0f                       // 远平面
-    );
-    orthoCam.setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glEnable(GL_PERSPECTIVE_CORRECTION_HINT);
+}
 
-    /// 创建三个物体来演示深度效果
-    Transform cube1; /// 中心
-    Transform cube2; /// 右边远处
-    Transform cube3; /// 左边近处
+GLvoid displayFPS(GLvoid)
+{
+    static Uint32 lastTime = SDL_GetTicks();
+    static int    loops    = 0;
+    static float  fps      = 0.0f;
 
-    cube2.setPos(glm::vec3(1.5f, 0.0f, 1.0f));   // 右边，Z正方向（更远）
-    cube3.setPos(glm::vec3(-1.5f, 0.0f, -1.0f)); // 左边，Z负方向（更近）
+    int newTime = SDL_GetTicks();
 
-    cube2.setScale(glm::vec3(0.7f)); // 稍微小一点
-    cube3.setScale(glm::vec3(0.7f));
-
-    std::cout << "===== 摄像机对比演示 =====" << std::endl;
-    std::cout << "按 1 键: 透视摄像机 (近大远小)" << std::endl;
-    std::cout << "按 2 键: 正交摄像机 (大小不变)" << std::endl;
-    std::cout << "按 + / - 键: 调整正交摄像机视野大小" << std::endl;
-    std::cout << "按 W/A/S/D: 移动摄像机位置" << std::endl;
-    std::cout << "========================" << std::endl;
-
-    bool  usePerspective = true;
-    float orthoSize      = 2.0f;
-    float counter        = 0.0f;
-
-    while (!display.isClosed())
+    if (newTime - lastTime > 100)
     {
-        display.clear(0.0f, 0.15f, 0.3f, 1.0f);
+        float newFPS = (float)loops / (float)(newTime - lastTime) * 1000.f;
 
-        // 处理键盘输入
-        const Uint8* keystate = SDL_GetKeyboardState(NULL);
+        fps = (fps + newFPS) / 2.0f;
 
-        // 切换摄像机类型
-        if (keystate[SDL_SCANCODE_1])
-            usePerspective = true;
-        if (keystate[SDL_SCANCODE_2])
-            usePerspective = false;
+        char title[80];
+        sprintf(title, "OpenGL Demo - %.2f", fps);
 
-        // 调整正交摄像机大小
-        if (keystate[SDL_SCANCODE_EQUALS] || keystate[SDL_SCANCODE_KP_PLUS])
-        {
-            orthoSize -= 0.02f;
-            orthoSize = std::max(orthoSize, 0.5f);
-            orthoCam.setSize(orthoSize, (float)WIDTH / (float)HEIGHT);
-        }
-        if (keystate[SDL_SCANCODE_MINUS] || keystate[SDL_SCANCODE_KP_MINUS])
-        {
-            orthoSize += 0.02f;
-            orthoSize = std::min(orthoSize, 5.0f);
-            orthoCam.setSize(orthoSize, (float)WIDTH / (float)HEIGHT);
-        }
+        SDL_SetWindowTitle(gWindow, title);
 
-        /// 移动摄像机
-        float     moveSpeed = 0.05f;
-        glm::vec3 camPos    = usePerspective ? perspCam.getPosition() : orthoCam.getPosition();
+        lastTime = newTime;
 
-        if (keystate[SDL_SCANCODE_W])
-            camPos.z -= moveSpeed;
-        if (keystate[SDL_SCANCODE_S])
-            camPos.z += moveSpeed;
-        if (keystate[SDL_SCANCODE_A])
-            camPos.x -= moveSpeed;
-        if (keystate[SDL_SCANCODE_D])
-            camPos.x += moveSpeed;
-
-        if (usePerspective)
-        {
-            perspCam.setPosition(camPos);
-            perspCam.setLookAt(glm::vec3(0.0f, 0.0f, 0.0f));
-        }
-        else
-        {
-            orthoCam.setPosition(camPos);
-        }
-
-        /// 让物体旋转
-        cube1.setRot(glm::vec3(0.0f, counter * 0.5f, 0.0f));
-        cube2.setRot(glm::vec3(0.0f, counter * 0.8f, 0.0f));
-        cube3.setRot(glm::vec3(0.0f, counter * 1.2f, 0.0f));
-
-        shader.bind();
-        texture.bind();
-
-        /// 根据摄像机类型渲染
-        if (usePerspective)
-        {
-            shader.update(cube1, perspCam);
-            cubeMesh.draw();
-            shader.update(cube2, perspCam);
-            cubeMesh.draw();
-            shader.update(cube3, perspCam);
-            cubeMesh.draw();
-
-            static int frame = 0;
-            if (++frame % 60 == 0)
-            {
-                glm::vec3 pos = perspCam.getPosition();
-                std::cout << "\r使用: 透视摄像机 | 位置: (" << pos.x << ", " << pos.y << ", " << pos.z << ") | FOV: 60°"
-                          << std::flush;
-            }
-        }
-        else
-        {
-            shader.update(cube1, orthoCam);
-            cubeMesh.draw();
-            shader.update(cube2, orthoCam);
-            cubeMesh.draw();
-            shader.update(cube3, orthoCam);
-            cubeMesh.draw();
-
-            static int frame = 0;
-            if (++frame % 60 == 0)
-            {
-                glm::vec3 pos = orthoCam.getPosition();
-                std::cout << "\r使用: 正交摄像机 | 位置: (" << pos.x << ", " << pos.y << ", " << pos.z
-                          << ") | 大小: " << orthoSize << std::flush;
-            }
-        }
-
-        display.update();
-        counter += 0.01f;
+        loops = 0;
     }
 
-    std::cout << "\n程序退出" << std::endl;
-    getchar();
+
+    loops++;
+}
+
+GLvoid drawScene(GLvoid)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glTranslatef(0.f, 0.f, -5.f);
+    glRotatef(cubeRotateX, 1, 0, 0);
+    glRotatef(cubeRotateY, 0, 1, 0);
+
+    glBegin(GL_QUADS);
+
+    /// 前面 (Front Face) - 红色
+    glColor3f(1.f, 0.0f, 0.0f);
+    glVertex3f(-1.0f, -1.0f, 1.0f); /// 左下
+    glVertex3f(1.0f, -1.0f, 1.0f);  /// 右下
+    glVertex3f(1.0f, 1.0f, 1.0f);   /// 右上
+    glVertex3f(-1.0f, 1.0f, 1.0f);  /// 左上
+
+    /// 后面 (Back Face) - 黄色
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glVertex3f(1.0f, -1.0f, -1.0f);  /// 右下
+    glVertex3f(-1.0f, -1.0f, -1.0f); /// 左下
+    glVertex3f(-1.0f, 1.0f, -1.0f);  /// 左上
+    glVertex3f(1.0f, 1.0f, -1.0f);   /// 右上
+
+    /// 左面 (Left Face) - 蓝色
+    glColor3f(0.f, 0.0f, 1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f); /// 左下
+    glVertex3f(-1.0f, -1.0f, 1.0f);  /// 右下
+    glVertex3f(-1.0f, 1.0f, 1.0f);   /// 右上
+    glVertex3f(-1.0f, 1.0f, -1.0f);  /// 左上
+
+    /// 右面 (Right Face) - 紫色
+    glColor3f(1.f, 0.0f, 1.0f);
+    glVertex3f(1.0f, -1.0f, 1.0f);  /// 左下
+    glVertex3f(1.0f, -1.0f, -1.0f); /// 右下
+    glVertex3f(1.0f, 1.0f, -1.0f);  /// 右上
+    glVertex3f(1.0f, 1.0f, 1.0f);   /// 左上
+
+    /// 上面 (Top Face) - 橙色
+    glColor3f(1.f, 0.5f, 0.0f);
+    glVertex3f(-1.0f, 1.0f, 1.0f);  /// 左下
+    glVertex3f(1.0f, 1.0f, 1.0f);   /// 右下
+    glVertex3f(1.0f, 1.0f, -1.0f);  /// 右上
+    glVertex3f(-1.0f, 1.0f, -1.0f); /// 左上
+
+    /// 下面 (Bottom Face) - 绿色
+    glColor3f(0.f, 1.0f, 0.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f); /// 左下
+    glVertex3f(1.0f, -1.0f, -1.0f);  /// 右下
+    glVertex3f(1.0f, -1.0f, 1.0f);   /// 右上
+    glVertex3f(-1.0f, -1.0f, 1.0f);  /// 左上
+
+    glEnd();
+
+    glFlush();
+
+    SDL_GL_SwapWindow(gWindow);
+
+    displayFPS();
+}
+
+void checkKeys(GLvoid)
+{
+    const float speed = 5.0f;
+
+    if (keys[SDL_SCANCODE_ESCAPE])
+    {
+        isRunning = false;
+    }
+
+    if (keys[SDL_SCANCODE_UP])
+    {
+        cubeRotateX += speed;
+    }
+
+    if (keys[SDL_SCANCODE_DOWN])
+    {
+        cubeRotateX -= speed;
+    }
+
+    if (keys[SDL_SCANCODE_LEFT])
+    {
+        cubeRotateY += speed;
+    }
+
+    if (keys[SDL_SCANCODE_RIGHT])
+    {
+        cubeRotateY -= speed;
+    }
+}
+
+// GLvoid timerLoop(int value)
+// {
+//     if (checkKeys())
+//         exit(0);
+//
+//     glutPostRedisplay();
+//     glutTimerFunc(16, timerLoop, 0); /// 改成 16ms (约60fps)
+// }
+
+
+// GLvoid keybordCB(unsigned char key, int x, int y)
+// {
+//     keys[key] = true;
+// }
+//
+// GLvoid keybordUpCB(unsigned char key, int x, int y)
+// {
+//     keys[key] = false;
+// }
+//
+// GLvoid keybordSpecialCB(int key, int x, int y)
+// {
+//     keys[key] = true;
+// }
+//
+// GLvoid keybordSpecialUpCB(int key, int x, int y)
+// {
+//     keys[key] = false;
+// }
+
+int main(int argc, char *argv[])
+{
+    /// 1. 初始化 SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    /// 2. 设置 OpenGL 属性
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+
+    /// 3. 创建窗口
+    gWindow = SDL_CreateWindow("Hello, OpenGL!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWidth, gHeight,
+                               SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!gWindow)
+    {
+        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
+
+    /// 4. 创建 OpenGL 上下文
+    gContext = SDL_GL_CreateContext(gWindow);
+    if (!gContext)
+    {
+        printf("OpenGL context could not be created! SDL_Error: %s\n", SDL_GetError());
+        SDL_DestroyWindow(gWindow);
+        SDL_Quit();
+        return 1;
+    }
+
+    /// 5. 初始化 GLAD（如果使用 GLAD）
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+    {
+        printf("Failed to initialize GLAD\n");
+        return 1;
+    }
+
+    printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
+
+    /// 6. 初始化 OpenGL 状态
+    initGL(gWidth, gHeight);
+
+    /// 7. 主循环
+    SDL_Event event;
+    while (isRunning)
+    {
+        /// 处理事件
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                    isRunning = false;
+                    break;
+
+                case SDL_KEYDOWN:
+                    keys[event.key.keysym.scancode] = true;
+                    break;
+
+                case SDL_KEYUP:
+                    keys[event.key.keysym.scancode] = false;
+                    break;
+
+
+                case SDL_WINDOWEVENT:
+                    if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+                    {
+                        int newWidth  = event.window.data1;
+                        int newHeight = event.window.data2;
+                        estableishProjectionMatrix(newWidth, newHeight);
+                    }
+                    break;
+            }
+        }
+
+        /// 检查键盘输入
+        checkKeys();
+
+        /// 绘制场景
+        drawScene();
+
+        /// 控制帧率（约 60 FPS）
+        SDL_Delay(16);
+    }
+
+    /// 8. 清理资源
+    SDL_GL_DeleteContext(gContext);
+    SDL_DestroyWindow(gWindow);
+    SDL_Quit();
+
     return 0;
 }
