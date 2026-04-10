@@ -40,6 +40,11 @@ if(OpenMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+find_package(OpenGL REQUIRED)
+message("OpenGL_FOUND = ${OpenGL_FOUND}")
+message("OPENGL_VERSION = ${OPENGL_VERSION}")
+message("OPENGL_LIBS = ${OPENGL_LIBS}")
+
 # #MFC
 # find_package(MFC)
 # message("MFC_FOUND = ${MFC_FOUND}")
@@ -116,6 +121,7 @@ include(CommonTools)
 add_subdirectory(sdl_hello_demo)
 add_subdirectory(glut_hello_world)
 add_subdirectory(sdl_hello_world)
+add_subdirectory(winapi_hello_world)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)

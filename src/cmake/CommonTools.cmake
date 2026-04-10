@@ -97,6 +97,11 @@ set(PYTHON_MOUDLES
 	Python3::Python
 )
 
+#opengl
+set(OpenGL_MOUDLES
+	OpenGL::GLU
+)
+
 #opencv
 set(Opencv_MOUDLES
     OpenCV_LIBS
