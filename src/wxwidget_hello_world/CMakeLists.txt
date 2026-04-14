@@ -27,8 +27,8 @@ if(MSVC)
 	
 	target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
     #[[修改入口点]]
-    target_link_options(${PROJECT_NAME} PRIVATE
-        "/SUBSYSTEM:WINDOWS"
-        #"/ENTRY:wWinMainCRTStartup"
+     target_link_options(${PROJECT_NAME} PRIVATE
+        # "/SUBSYSTEM:WINDOWS"
+        "/ENTRY:WinMainCRTStartup"
     )
 endif()
