@@ -97,6 +97,13 @@ message("Stb_FOUND = ${Stb_FOUND}")
 message("Stb_VERSION = ${Stb_VERSION}")
 message("Stb_LIBS = ${Stb_LIBS}")
 
+#wxWidgets
+find_package(wxWidgets CONFIG REQUIRED)
+message("wxWidgets_FOUND = ${wxWidgets_FOUND}")
+message("wxWidgets_VERSION = ${wxWidgets_VERSION}")
+message("wxWidgets_LIBS = ${wxWidgets_LIBS}")
+
+
 # 外部依赖项
 set(DPS_INCLUDES)
 set(DPS_TARGETS)
@@ -122,6 +129,7 @@ add_subdirectory(sdl_hello_demo)
 add_subdirectory(glut_hello_world)
 add_subdirectory(sdl_hello_world)
 add_subdirectory(winapi_hello_world)
+add_subdirectory(wxwidget_hello_world)
 
 # 拷贝assert目录到输出目录
 set(ASSERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/assert)

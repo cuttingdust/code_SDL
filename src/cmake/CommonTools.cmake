@@ -149,6 +149,13 @@ set(glut_MOUDLES
 	GLUT::GLUT
 )
 
+#wxWidget
+set(wxWidget_MOUDLES
+	wx::core
+	wx::base
+	wx::gl
+)
+
 # 获取当前目录下源码和头文件
 macro(get_src_include)
     aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src SRC)
