@@ -110,6 +110,7 @@ public:
         switch (key)
         {
             case WXK_ESCAPE:
+                // Destroy(); /// 不会触发OnClose
                 Close();
                 return;
             case WXK_UP:
@@ -307,7 +308,7 @@ class MyApp : public wxApp
 public:
     bool OnInit() override
     {
-        timeBeginPeriod(1);
+        // timeBeginPeriod(1);
 
         MainFrame* frame = new MainFrame();
         frame->Show(true);
@@ -316,7 +317,7 @@ public:
 
     int OnExit() override
     {
-        timeEndPeriod(1);
+        // timeEndPeriod(1);
         return wxApp::OnExit();
     }
 };
